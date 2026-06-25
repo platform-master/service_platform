@@ -1,0 +1,33 @@
+<form id="dbmForm">
+    <input type="text" name="full_name" placeholder="الاسم الكامل" required><br>
+    <input type="text" name="role" placeholder="الصفة" required><br>
+    <input type="text" name="restaurant_name" placeholder="اسم المنشأة" required><br>
+    <input type="tel" name="phone_number" placeholder="رقم الجوال" required><br>
+    <input type="email" name="email" placeholder="البريد الإلكتروني" required><br>
+    <input type="text" name="city" placeholder="المدينة" required><br>
+    <textarea name="challenges" placeholder="التحديات"></textarea><br>
+    <button type="submit" id="submitBtn">إرسال</button>
+</form>
+<pre id="debugMsg" style="color:red;"></pre>
+
+<script>
+    const supabase = supabase.createClient('https://fhzrzfzabpyhyaxwibbv.supabase.co', 'JLzCqnbdefm6Si1UspgwMSmDCnLY');
+    
+    document.getElementById('dbmForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const debug = document.getElementById('debugMsg');
+        debug.innerText = 'جاري الإرسال...';
+        
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const { error } = await supabase.from('leads').insert([data]);
+
+        if (error) {
+            debug.innerText = 'خطأ: ' + JSON.stringify(error, null, 2);
+        } else {
+            debug.style.color = 'green';
+            debug.innerText = 'تم الإرسال بنجاح!';
+        }
+    });
+</script>
