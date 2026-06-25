@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المطاعم - DBM</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 500px; margin: auto; }
+        .hero { text-align: center; margin-bottom: 30px; }
+        .hero h1 { color: #1a73e8; }
+        .form-card { background: white; padding: 30px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        label { display: block; margin-top: 15px; font-weight: 600; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #1a73e8; color: white; border: none; border-radius: 8px; margin-top: 25px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:disabled { background: #888; }
+        #message { display: none; margin-top: 20px; padding: 15px; border-radius: 8px; text-align: center; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero">
+        <h1>نظام DBM للمطاعم</h1>
+        <p>ارفع كفاءة مطعمك، نظم طلباتك، وزد أرباحك بخطوات بسيطة.</p>
+    </div>
+
+    <div class="form-card">
+        <form id="dbmForm">
+            <label>الاسم</label>
+            <input type="text" id="full_name" required>
+            <label>الصفة</label>
+            <select id="role"><option value="owner">مالك</option><option value="manager">مدير</option><option value="partner">شريك</option></select>
+            <label>اسم المطعم</label>
+            <input type="text" id="restaurant_name" required>
+            <label>رقم الجوال</label>
+            <input type="tel" id="phone_number" required>
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="email" required>
+            <label>المدينة</label>
+            <input type="text" id="city" required>
+            <label>التحديات</label>
+            <textarea id="challenges"></textarea>
+            <button type="submit" id="submitBtn">إرسال الطلب</button>
+        </form>
+        <div id="message"></div>
+    </div>
+</div>
+
+<script>
+    const supabase = supabase.createClient('https://fhzrzfzabpyhyaxwibbv.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZoenJ6ZnphYnB5aHlheHdpYmJ2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjM0OTY0OCwiZXhwIjoyMDk3OTI1NjQ4fQ.nbzjga9Nv_5AI3v4GEBYM61-OFrLpRQj6CrUn4b7l94');
+
+    document.getElementById('dbmForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const msg = document.getElementById('message');
+        btn.disabled = true;
+        btn.innerText = 'جاري الإرسال...';
+        
+        const { data, error } = await supabase.from('leads').insert([{ 
+            full_name: document.getElementById('full_name').value,
+            role: document.getElementById('role').value,
+            restaurant_name: document.getElementById('restaurant_name').value,
+            phone_number: document.getElementById('phone_number').value,
+            email: document.getElementById('email').value,
+            city: document.getElementById('city').value,
+            challenges: document.getElementById('challenges').value
+        }]).select();
+
+        msg.style.display = 'block';
+        if (error) {
+            msg.className = 'error';
+            msg.innerText = 'حدث خطأ: ' + error.message;
+            btn.disabled = false; btn.innerText = 'إرسال الطلب';
+        } else {
+            msg.className = 'success';
+            msg.innerText = 'تم استلام طلبك بنجاح! سنتواصل معك قريباً.';
+            document.getElementById('dbmForm').reset();
+            btn.style.display = 'none';
+        }
+    });
+</script>
+</body>
+</html>
